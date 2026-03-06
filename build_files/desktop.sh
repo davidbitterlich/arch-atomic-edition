@@ -11,7 +11,7 @@ GNOME=(
     "gdm"
 )
 
-DESKTOP=$1 | tr '[:lower:]' '[:upper:]'
+DESKTOP=$(echo $1 | tr '[:lower:]' '[:upper:]')
 
 packages=""
 login_manager=""
