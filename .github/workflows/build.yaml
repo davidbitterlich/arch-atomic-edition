@@ -21,10 +21,6 @@ env:
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
   DEFAULT_TAG: "latest"
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-${{ matrix.desktop }}
-  cancel-in-progress: true
-
 jobs:
   build_push:
     name: Build and push ${{ matrix.desktop }} image
@@ -33,6 +29,10 @@ jobs:
     strategy:
       matrix:
         desktop: [kde, gnome]
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-${{ matrix.desktop }}
+      cancel-in-progress: true
 
     permissions:
       contents: read
