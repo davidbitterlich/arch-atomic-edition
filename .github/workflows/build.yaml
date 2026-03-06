@@ -30,7 +30,6 @@ jobs:
     strategy:
       matrix:
         desktop: [kde, gnome]
-        max-parallel: 1
         fail-fast: false
 
     concurrency:
