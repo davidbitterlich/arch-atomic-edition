@@ -103,7 +103,7 @@ jobs:
             [ -z "${TAG}" ] && continue
             for i in $(seq "${MAX_RETRIES}"); do
               podman push --digestfile=/tmp/digestfile \
-                "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
+                "${IMAGE_REGISTRY}/${IMAGE_NAME}:${DEFAULT_TAG}" \
                 "${TAG}" && break || sleep $((5 * i))
             done
           done <<< "${TAGS}"
