@@ -130,7 +130,7 @@ jobs:
             for i in $(seq "${MAX_RETRIES}"); do
               podman push --digestfile=/tmp/digestfile \
                 "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
-                "${IMAGE_REGISTRY}/${IMAGE_NAME}:${TAG}" && break || sleep $((5 * i))
+                "${TAG}" && break || sleep $((5 * i))
             done
           done <<< "${TAGS}"
           
@@ -149,7 +149,7 @@ jobs:
         run: |
           while IFS= read -r TAG; do
             [ -z "${TAG}" ] && continue
-            cosign sign -y --new-bundle-format=false --use-signing-config=false \
+            cosign sign -y \
               --key env://COSIGN_PRIVATE_KEY \
-              "${IMAGE_REGISTRY}/${IMAGE_NAME}:${TAG}"
+              "${TAG}"
           done <<< "${TAGS}"
