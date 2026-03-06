@@ -25,10 +25,13 @@ jobs:
   build_push:
     name: Build and push ${{ matrix.desktop }} image
     runs-on: ubuntu-24.04
+    timeout-minutes: 120
     
     strategy:
       matrix:
         desktop: [kde, gnome]
+        max-parallel: 1
+        fail-fast: false
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-${{ matrix.desktop }}
