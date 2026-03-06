@@ -30,7 +30,6 @@ jobs:
     strategy:
       matrix:
         desktop: [kde, gnome]
-        fail-fast: false
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-${{ matrix.desktop }}
