@@ -16,7 +16,8 @@ on:
 env:
   IMAGE_DESC: "Experimental arch-bootc POC image"
   IMAGE_KEYWORDS: "bootc,archlinux,arch"
-  BASE_IMAGE_NAME: "${{ github.event.repository.name }}"
+  IMAGE_LOGO_URL: "https://avatars.githubusercontent.com/u/230667510?s=400"
+  BASE_IMAGE_NAME: "arch-atomic-edition"
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
   DEFAULT_TAG: "latest"
 
@@ -83,33 +84,21 @@ jobs:
 
       - name: Login to GitHub Container Registry
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LOGIN_USER: ${{ github.actor }}
-        run: |
-          echo "${GITHUB_TOKEN}" | podman login -u "${LOGIN_USER}" --password-stdin "ghcr.io"
-          echo "${GITHUB_TOKEN}" | docker login -u "${LOGIN_USER}" --password-stdin "ghcr.io" # For cosign
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-
-      - name: Push to GHCR
+      - name: Push To GHCR
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        id: push
-        env:
-          TAGS: ${{ steps.metadata.outputs.tags }}
-          MAX_RETRIES: 3
-        run: |
-          set -x
-          
-          while IFS= read -r TAG; do
-            [ -z "${TAG}" ] && continue
-            for i in $(seq "${MAX_RETRIES}"); do
-              podman push --digestfile=/tmp/digestfile \
-                "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
-                "${TAG}" && break || sleep $((5 * i))
-            done
-          done <<< "${TAGS}"
-          
-          echo "remote_image_digest=$(cat /tmp/digestfile)" >> ${GITHUB_OUTPUT}
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Cosign
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)

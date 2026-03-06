@@ -13,15 +13,11 @@ export CONTAINER_RUNTIME := container_runtime
 _image_with_desktop desktop:
     @echo "{{image_name}}-$(echo {{desktop}} | tr '[:upper:]' '[:lower:]')"
 
-build-containerfile desktop=default_desktop:
-    #!/usr/bin/env bash
-    DESKTOP_LOWER=$(echo "{{desktop}}" | tr '[:upper:]' '[:lower:]')
-    IMAGE_WITH_DESKTOP="{{image_name}}-${DESKTOP_LOWER}"
+build-containerfile $image_name=image_name $desktop=default_desktop:
     sudo {{container_runtime}} build -f Containerfile \
-        --security-opt label=disable \
-        --security-opt seccomp=unconfined \
-        --build-arg DESKTOP="{{desktop}}" \
-        -t "${IMAGE_WITH_DESKTOP}:latest" .
+    --security-opt label=disable \
+    --security-opt seccomp=unconfined \
+    --build-arg DESKTOP="${desktop}" -t "${image_name}:latest" .
 
 bootc desktop=default_desktop *ARGS:
     #!/usr/bin/env bash
