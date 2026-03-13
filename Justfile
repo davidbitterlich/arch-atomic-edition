@@ -19,7 +19,7 @@ build-containerfile $image_name=image_name $desktop=default_desktop:
     --security-opt seccomp=unconfined \
     --build-arg DESKTOP="${desktop}" -t "${image_name}:latest" .
 
-bootc desktop=default_desktop *ARGS:
+bootc $desktop=default_desktop *ARGS:
     #!/usr/bin/env bash
     DESKTOP_LOWER=$(echo "{{desktop}}" | tr '[:upper:]' '[:lower:]')
     IMAGE_WITH_DESKTOP="{{image_name}}-${DESKTOP_LOWER}"
@@ -32,24 +32,29 @@ bootc desktop=default_desktop *ARGS:
         -v "{{base_dir}}:/data" \
         "${IMAGE_WITH_DESKTOP}:{{image_tag}}" bootc {{ARGS}}
 
-generate-bootable-image desktop=default_desktop base_dir=base_dir filesystem=filesystem:
+generate-bootable-image $base_dir=base_dir $desktop=default_desktop $filesystem=filesystem:
     #!/usr/bin/env bash
     if [ ! -e "${base_dir}/bootable.img" ] ; then
-        fallocate -l 20G "${base_dir}/bootable.img"
+        fallocate -l 64G "${base_dir}/bootable.img"
     fi
-    just bootc {{desktop}} install to-disk --composefs-backend --via-loopback /data/bootable.img --filesystem "{{filesystem}}" --wipe --bootloader systemd
+    just bootc desktop=$DESKTOP install to-disk --composefs-backend --via-loopback /data/bootable.img --filesystem "${filesystem}" --wipe --bootloader systemd
+
 
 build-iso:
     #!/usr/bin/env bash
     set -xeuo pipefail
     sudo $CONTAINER_RUNTIME run \
         --rm --privileged --pid=host \
-        -it \
         -v "{{base_dir}}:/data" \
         ghcr.io/bootcrew/arch-bootc:latest \
-        sh <<"ISOEOF"
-    set -xeuo pipefail
-    pacman -Sy --noconfirm archiso
-    cp /usr/sbin/bootc /data/build_files/archlive/airootfs/usr/local/bin
-    mkarchiso -v -w /tmp/work -o /data/out /data/build_files/archlive
-    ISOEOF
+        sh -euxo pipefail -c '
+            pacman -Sy --noconfirm archiso
+            rm -rf /var/lib/containers/storage
+            rm -rf /run/containers/storage
+            cp /usr/sbin/bootc /data/build_files/archlive/airootfs/usr/local/bin
+            mkdir -p /var/tmp
+            podman --storage-driver=vfs pull ghcr.io/bootcrew/arch-bootc:latest
+            mkdir -p /data/build_files/archlive/airootfs/opt/images
+            podman --storage-driver=vfs save -o /data/build_files/archlive/airootfs/opt/images/arch-atomic.tar ghcr.io/bootcrew/arch-bootc:latest
+            mkarchiso -v -w /tmp/work -o /data/out /data/build_files/archlive
+        '

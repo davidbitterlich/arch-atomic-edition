@@ -17,6 +17,6 @@ PACKAGES=(
     "flatpak"
 )
 
-pacman -Syu
+pacman -Sy --noconfirm
 pacman -S --needed --noconfirm "${PACKAGES[@]}"
 pacman -S --clean --noconfirm

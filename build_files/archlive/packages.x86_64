@@ -83,10 +83,12 @@ openconnect
 openpgp-card-tools
 openssh
 openvpn
+ostree
 partclone
 parted
 partimage
 pcsclite
+podman
 ppp
 pptpclient
 pv
