@@ -4,6 +4,15 @@ set -ouex pipefail
 KDE=(
     "plasma-meta"
     "sddm-kcm"
+    "kde-utilities-meta"
+    "kde-system-meta"
+    "dolphin-plugins"
+    "plasma-keyboard"
+    "kio-extras"
+    "kdeconnect"
+    "kdenetwork-filesharing"
+    "kio-gdrive"
+    "kio-zeroconf"    
 )
 
 GNOME=(
@@ -37,3 +46,5 @@ then
     pacman -S --clean --noconfirm
     systemctl enable $login_manager
 fi
+
+systemctl enable NetworkManager

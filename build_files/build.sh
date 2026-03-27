@@ -15,6 +15,7 @@ PACKAGES=(
     "git"
     "bazaar"
     "flatpak"
+    "sudo"
 )
 
 pacman -Sy --noconfirm

@@ -1,7 +1,7 @@
 FROM scratch AS ctx
 COPY build_files /
 
-FROM ghcr.io/bootcrew/arch-bootc:latest
+FROM ghcr.io/davidbitterlich/arch-bootc:latest
 
 ARG DESKTOP
 ENV DESKTOP=${DESKTOP}
@@ -17,8 +17,8 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx,rw \
     /ctx/finalize.sh
 
 # Setup a temporary root passwd (changeme) for dev purposes
-# RUN pacman -S whois --noconfirm
-# RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
+RUN pacman -S whois --noconfirm
+RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 
 # https://bootc-dev.github.io/bootc/bootc-images.html#standard-metadata-for-bootc-compatible-images
 LABEL containers.bootc 1
