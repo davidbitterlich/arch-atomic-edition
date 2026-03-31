@@ -18,6 +18,7 @@ KDE=(
 GNOME=(
     "gnome-shell"
     "gdm"
+    "networkmanager"
 )
 
 DESKTOP=$(echo $1 | tr '[:lower:]' '[:upper:]')
