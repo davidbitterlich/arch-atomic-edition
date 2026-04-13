@@ -17,6 +17,7 @@ PACKAGES=(
     "flatpak"
     "sudo"
     "vim"
+    "nano"
     "curl"
 )
 
