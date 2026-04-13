@@ -16,6 +16,8 @@ PACKAGES=(
     "bazaar"
     "flatpak"
     "sudo"
+    "vim"
+    "curl"
 )
 
 pacman -Sy --noconfirm

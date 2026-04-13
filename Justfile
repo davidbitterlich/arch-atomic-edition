@@ -46,15 +46,13 @@ build-iso:
     sudo $CONTAINER_RUNTIME run \
         --rm --privileged --pid=host \
         -v "{{base_dir}}:/data" \
-        ghcr.io/bootcrew/arch-bootc:latest \
+        ghcr.io/davidbitterlich/arch-bootc:latest \
         sh -euxo pipefail -c '
             pacman -Sy --noconfirm archiso
-            rm -rf /var/lib/containers/storage
-            rm -rf /run/containers/storage
-            cp /usr/sbin/bootc /data/build_files/archlive/airootfs/usr/local/bin
-            mkdir -p /var/tmp
-            podman --storage-driver=vfs pull ghcr.io/bootcrew/arch-bootc:latest
-            mkdir -p /data/build_files/archlive/airootfs/opt/images
-            podman --storage-driver=vfs save -o /data/build_files/archlive/airootfs/opt/images/arch-atomic.tar ghcr.io/bootcrew/arch-bootc:latest
+
+            curl -s https://api.github.com/repos/frostyard/nbc/releases/latest \
+            | jq -r ".assets[] | select(.name | test(\"linux_amd64.tar.gz\")) | .browser_download_url" \
+            | xargs curl -L -O
+
             mkarchiso -v -w /tmp/work -o /data/out /data/build_files/archlive
         '
