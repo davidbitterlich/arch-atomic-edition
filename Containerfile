@@ -4,7 +4,10 @@ COPY build_files /
 FROM ghcr.io/davidbitterlich/arch-bootc:latest
 
 ARG DESKTOP
+ARG VARIANT
+
 ENV DESKTOP=${DESKTOP}
+ENV VARIANT=${VARIANT}
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx,rw \
     --mount=type=cache,dst=/var/cache \
@@ -14,6 +17,7 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx,rw \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build.sh && \
     /ctx/desktop.sh ${DESKTOP} && \
+    if [ "${VARIANT}" = "surface" ]; then /ctx/surface.sh; fi && \
     /ctx/finalize.sh
 
 # Setup a temporary root passwd (changeme) for dev purposes

@@ -31,7 +31,18 @@ jobs:
 
     strategy:
       matrix:
-        desktop: [gnome, kde]
+        include:
+          - desktop: kde
+            variant: standard
+
+          - desktop: kde
+            variant: surface
+
+          - desktop: gnome
+            variant: standard
+
+          - desktop: gnome
+            variant: surface
 
     permissions:
       contents: read
@@ -54,7 +65,11 @@ jobs:
 
       - name: Set image name
         run: |
-          echo "IMAGE_NAME=${BASE_IMAGE_NAME}-${{ matrix.desktop }}" >> $GITHUB_ENV
+          if [ "${{ matrix.variant }}" = "surface" ]; then
+            echo "IMAGE_NAME=${BASE_IMAGE_NAME}-${{ matrix.desktop }}-surface" >> $GITHUB_ENV
+          else
+            echo "IMAGE_NAME=${BASE_IMAGE_NAME}-${{ matrix.desktop }}" >> $GITHUB_ENV
+          fi
 
       - name: Image Metadata
         id: metadata
@@ -77,6 +92,7 @@ jobs:
           containerfiles: ./Containerfile
           build-args: |
             DESKTOP=${{ matrix.desktop }}
+            VARIANT=${{ matrix.variant }}
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
