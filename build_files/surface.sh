@@ -15,7 +15,7 @@ EOF
 
 pacman -Syu --noconfirm
 
-pacman -Rns --noconfirm linux linux-headers
+pacman -Rns --noconfirm linux
 pacman -S --noconfirm \
     linux-surface \
     linux-surface-headers \
