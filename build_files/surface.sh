@@ -22,3 +22,26 @@ pacman -S --noconfirm \
     linux-firmware-intel \
     linux-surface-secureboot-mok \
     iptsd
+
+# build initramfs
+
+KVER=$(basename /usr/lib/modules/*)
+
+mkdir -p /var/tmp
+chmod 1777 /var/tmp
+
+cat >/etc/dracut.conf.d/bootc.conf <<EOF
+hostonly="no"
+add_dracutmodules+=" systemd ostree btrfs "
+EOF
+
+dracut \
+  --force \
+  --kver "${KVER}" \
+  --no-hostonly \
+  --reproducible \
+  --add ostree \
+  "/boot/initramfs-${KVER}.img"
+
+cp "/usr/lib/modules/${KVER}/vmlinuz" "/boot/vmlinuz-${KVER}" || true
+
